@@ -2,15 +2,17 @@ from flask import Flask, render_template, request, redirect, url_for, session, s
 import sqlite3
 import pandas as pd
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 
-# ==================== CRIAR PASTA DE UPLOADS ====================
+# ==================== CRIAR PASTAS NECESSÁRIAS ====================
 os.makedirs("static/uploads", exist_ok=True)
+os.makedirs("data", exist_ok=True)
+
+# ==================== CONFIGURAÇÃO ====================
+DB_NAME = "data/pedidos.db"
 
 app = Flask(__name__)
 app.secret_key = "uma_chave_super_secreta_aqui"
-
-DB_NAME = "pedidos.db"
 
 # ==================== USUÁRIOS ====================
 USUARIOS = {
