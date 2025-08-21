@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Requisitante</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Painel do Requisitante - {{ usuario }}</h1>
+        <a href="{{ url_for('novo_pedido') }}">Novo Pedido</a>
+        <a href="{{ url_for('logout') }}">Sair</a>
+    </header>
+    <main>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Status</th>
+                <th>Loja</th>
+                <th>Cliente</th>
+                <th>Endereço</th>
+                <th>Vendedor</th>
+                <th>Motorista</th>
+                <th>Caminhão</th>
+                <th>Período</th>
+                <th>Data Entrega</th>
+                <th>Número Pedido</th>
+                <th>Número Requisição</th>
+                <th>Volume Aproximado</th>
+                <th>Observações Logística</th>
+                <th>Arquivo</th>
+            </tr>
+            {% for p in pedidos %}
+            <tr class="
+                {% if p[10] == 'Entregue' %}status-entregue{% endif %}
+                {% if p[10] == 'Em Rota' %}status-emrota{% endif %}
+                {% if p[10] == 'Atrasado' %}status-atrasado{% endif %}
+                {% if p[10] == 'Correção' %}status-correcao{% endif %}
+                {% if p[10] == 'Cancelado' %}status-cancelado{% endif %}
+            ">
+                <td>{{ p[0] }}</td>
+                <td>{{ p[10] }}</td>
+                <td>{{ p[2] }}</td>
+                <td>{{ p[3] }}</td>
+                <td>{{ p[4] }}</td>
+                <td>{{ p[1] }}</td>
+                <td>{{ p[11] }}</td>
+                <td>{{ p[12] }}</td>
+                <td>{{ p[8] }}</td>
+                <td>{{ p[9] }}</td>
+                <td>{{ p[5] }}</td>
+                <td>{{ p[6] }}</td>
+                <td>{{ p[7] }}</td>
+                <td>{{ p[15] }}</td>
+                <td>
+                    {% if p[13] %}
+                        <a href="{{ url_for('static', filename=p[13]) }}" target="_blank">Download</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </main>
+</body>
+</html>

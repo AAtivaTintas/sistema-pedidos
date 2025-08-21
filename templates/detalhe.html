@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Detalhes do Pedido</h1>
+<p>Vendedor: {{ pedido.vendedor }}</p>
+<p>Loja: {{ pedido.loja }}</p>
+<p>Cliente: {{ pedido.cliente }}</p>
+<p>Endereço: {{ pedido.endereco }}</p>
+<p>Observações: {{ pedido.observacoes }}</p>
+<p>Status: {{ pedido.status }}</p>
+{% if pedido.arquivo %}
+<p>Arquivo: <a href="{{ url_for('static', filename='uploads/' ~ pedido.arquivo) }}" target="_blank">Ver PDF</a></p>
+{% endif %}
+{% endblock %}

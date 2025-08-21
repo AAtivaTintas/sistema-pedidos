@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel de Pedidos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f2f2f2; margin:0; padding:0; }
+        header { background-color: #007bff; color:white; padding:15px; text-align:center; position:relative;}
+        header a { color:white; text-decoration:none; margin-left:15px; }
+        main { padding:20px; }
+        table { width:100%; border-collapse: collapse; background-color:#fff; box-shadow:0 0 8px rgba(0,0,0,0.1); }
+        th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+        th { background-color:#007bff; color:white; }
+        select, input, textarea, button { padding:6px; border-radius:4px; border:1px solid #ccc; }
+        button { background-color:#007bff; color:white; border:none; cursor:pointer; }
+        button:hover { background-color:#0056b3; }
+        .status-entregue {background-color: #28a745; color: white;}
+        .status-emrota {background-color: #ffc107; color: black;}
+        .status-atrasado {background-color: #dc3545; color: white;}
+        .status-pendente {background-color: #6c757d; color: white;}
+        .status-correcao, .status-cancelado {text-decoration: line-through; color: gray;}
+        a.pdf-link { color:#007bff; text-decoration:none; }
+        a.pdf-link:hover { text-decoration:underline; }
+        .filtro { margin-bottom:15px; }
+        .filtro label { margin-right:10px; font-weight:bold; }
+        .filtro select, .filtro input { margin-right:15px; }
+        form { display:inline-block; }
+    </style>
+</head>
+<body>
+<header>
+    {% if is_logistica %}
+        <h1>Painel da Logística</h1>
+        <a href="{{ url_for('exportar') }}">Download Excel</a>
+    {% else %}
+        <h1>Painel do Requisitante</h1>
+    {% endif %}
+    <a href="{{ url_for('logout') }}" style="position:absolute; right:20px; top:15px;">Sair</a>
+</header>
+<main>
+    <h2>Filtrar Pedidos</h2>
+    <form method="GET" class="filtro">
+        <label>Loja:</label>
+        <select name="loja">
+            <option value="">Todas</option>
+            {% for l in lojas %}
+                <option value="{{ l }}" {% if request.args.get('loja') == l %}selected{% endif %}>{{ l }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Status:</label>
+        <select name="status">
+            <option value="">Todos</option>
+            {% for s in status_list %}
+                <option value="{{ s }}" {% if request.args.get('status') == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Cliente:</label>
+        <input type="text" name="cliente" value="{{ request.args.get('cliente','') }}">
+
+        <label>Data:</label>
+        <input type="date" name="data" value="{{ request.args.get('data','') }}">
+
+        <button type="submit">Filtrar</button>
+    </form>
+
+    {% if not is_logistica %}
+    <h2>Novo Pedido</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="text" name="vendedor" placeholder="Nome do Vendedor" required>
+        <select name="loja" required>
+            {% for l in lojas %}
+                <option value="{{ l }}" {% if user==l %}selected{% endif %}>{{ l }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="cliente" placeholder="Cliente" required>
+        <input type="text" name="endereco" placeholder="Endereço" required>
+        <input type="text" name="numero_pedido" placeholder="Número do Pedido" required>
+        <input type="text" name="numero_requisicao" placeholder="Número da Requisição" required>
+        <input type="text" name="volume_aprox" placeholder="Volume Aproximado">
+        <input type="text" name="periodo" placeholder="Período">
+        <input type="date" name="data_entrega" required>
+        <input type="file" name="arquivo">
+        <textarea name="obs_requisitante" placeholder="Observações"></textarea>
+        <button type="submit">Adicionar Pedido</button>
+    </form>
+    {% endif %}
+
+    <h2>Todos os Pedidos</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Status</th>
+            <th>Loja</th>
+            <th>Cliente</th>
+            <th>Endereço</th>
+            <th>Vendedor</th>
+            <th>Motorista</th>
+            <th>Caminhão</th>
+            <th>Período</th>
+            <th>Data Entrega</th>
+            <th>Número Pedido</th>
+            <th>Número Requisição</th>
+            <th>Volume Aproximado</th>
+            <th>Observações Requisitante</th>
+            <th>Observações Logística</th>
+            <th>Arquivo</th>
+            {% if is_logistica %}<th>Ação</th>{% endif %}
+        </tr>
+        {% for p in pedidos %}
+        <tr class="
+            {% if p['status'] == 'Entregue' %}status-entregue{% endif %}
+            {% if p['status'] == 'Em Rota' %}status-emrota{% endif %}
+            {% if p['status'] == 'Atrasado' %}status-atrasado{% endif %}
+            {% if p['status'] == 'Pendente' %}status-pendente{% endif %}
+            {% if p['status'] == 'Correção' %}status-correcao{% endif %}
+            {% if p['status'] == 'Cancelado' %}status-cancelado{% endif %}
+        ">
+            <td>{{ p['id'] }}</td>
+            <td>{{ p['status'] }}</td>
+            <td>{{ p['loja'] }}</td>
+            <td>{{ p['cliente'] }}</td>
+            <td>{{ p['endereco'] }}</td>
+            <td>{{ p['vendedor'] }}</td>
+            <td>{{ p['motorista'] }}</td>
+            <td>{{ p['caminhao'] }}</td>
+            <td>{{ p['periodo'] }}</td>
+            <td>{{ p['data_entrega'] }}</td>
+            <td>{{ p['numero_pedido'] }}</td>
+            <td>{{ p['numero_requisicao'] }}</td>
+            <td>{{ p['volume_aprox'] }}</td>
+            <td>{{ p['obs_requisitante'] }}</td>
+            <td>{{ p['obs_logistica'] }}</td>
+            <td>
+                {% if p['arquivo'] %}
+                    <a href="{{ url_for('static', filename=p['arquivo']) }}" target="_blank" class="pdf-link">Download</a>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            {% if is_logistica %}
+            <td>
+                <form method="POST" action="{{ url_for('atualizar_pedido') }}">
+                    <input type="hidden" name="pedido_id" value="{{ p['id'] }}">
+                    <select name="status">
+                        {% for s in status_list %}
+                        <option value="{{ s }}" {% if p['status']==s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="motorista">
+                        <option value="">Selecione</option>
+                        {% for m in motoristas %}
+                            <option value="{{ m }}" {% if p['motorista']==m %}selected{% endif %}>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="caminhao">
+                        <option value="">Selecione</option>
+                        {% for c in caminhoes %}
+                            <option value="{{ c }}" {% if p['caminhao']==c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                    <textarea name="obs_logistica" placeholder="Observações">{{ p['obs_logistica'] }}</textarea>
+                    <button type="submit">Atualizar</button>
+                </form>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+</main>
+</body>
+</html>

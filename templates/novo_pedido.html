@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Novo Pedido</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Novo Pedido</h1>
+        <a href="{{ url_for('painel_requisitante') }}">Voltar</a>
+        <a href="{{ url_for('logout') }}">Sair</a>
+    </header>
+    <main>
+        <form method="POST" enctype="multipart/form-data">
+            <label>Vendedor:</label>
+            <input type="text" name="vendedor" required>
+
+            <label>Cliente:</label>
+            <input type="text" name="cliente" required>
+
+            <label>Endereço:</label>
+            <input type="text" name="endereco" required>
+
+            <label>Número do Pedido:</label>
+            <input type="text" name="numero_pedido" required>
+
+            <label>Número da Requisição:</label>
+            <input type="text" name="numero_requisicao" required>
+
+            <label>Volume Aproximado:</label>
+            <input type="text" name="volume_aprox">
+
+            <label>Período de Entrega:</label>
+            <select name="periodo">
+                <option value="Manhã">Manhã</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Noite">Noite</option>
+            </select>
+
+            <label>Data de Entrega:</label>
+            <input type="date" name="data_entrega" required>
+
+            <label>Arquivo (PDF ou imagem):</label>
+            <input type="file" name="arquivo">
+
+            <label>Observações:</label>
+            <textarea name="obs_requisitante"></textarea>
+
+            <button type="submit">Enviar Pedido</button>
+        </form>
+    </main>
+</body>
+</html>

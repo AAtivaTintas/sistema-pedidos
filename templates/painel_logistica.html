@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel da Logística</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Painel da Logística</h1>
+        <a href="{{ url_for('logout') }}">Sair</a>
+        <a href="{{ url_for('exportar') }}">Download Excel</a>
+    </header>
+    <main>
+        <form method="GET">
+            <label>Loja:</label>
+            <select name="loja">
+                <option value="">Todas</option>
+                {% for l in ['loja2','loja3','loja4','loja5','loja6','loja7'] %}
+                <option value="{{ l }}" {% if request.args.get('loja')==l %}selected{% endif %}>{{ l }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Status:</label>
+            <select name="status">
+                <option value="">Todos</option>
+                {% for s in status_list %}
+                    <option value="{{ s }}" {% if request.args.get('status')==s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Cliente:</label>
+            <input type="text" name="cliente" value="{{ request.args.get('cliente','') }}">
+
+            <label>Data:</label>
+            <input type="date" name="data" value="{{ request.args.get('data','') }}">
+            <button type="submit">Filtrar</button>
+        </form>
+
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Status</th>
+                <th>Loja</th>
+                <th>Cliente</th>
+                <th>Endereço</th>
+                <th>Vendedor</th>
+                <th>Motorista</th>
+                <th>Caminhão</th>
+                <th>Período</th>
+                <th>Data Entrega</th>
+                <th>Número Pedido</th>
+                <th>Número Requisição</th>
+                <th>Volume Aproximado</th>
+                <th>Observações Requisitante</th>
+                <th>Observações Logística</th>
+                <th>Arquivo</th>
+                <th>Ação</th>
+            </tr>
+            {% for p in pedidos %}
+            <tr class="
+                {% if p[10]=='Entregue' %}status-entregue{% endif %}
+                {% if p[10]=='Em Rota' %}status-emrota{% endif %}
+                {% if p[10]=='Atrasado' %}status-atrasado{% endif %}
+                {% if p[10]=='Correção' %}status-correcao{% endif %}
+                {% if p[10]=='Cancelado' %}status-cancelado{% endif %}
+            ">
+                <td>{{ p[0] }}</td>
+                <td>
+                    <form method="POST">
+                        <input type="hidden" name="pedido_id" value="{{ p[0] }}">
+                        <select name="status">
+                            <option value="Pendente" {% if p[10]=='Pendente' %}selected{% endif %}>Pendente</option>
+                            <option value="Em Rota" {% if p[10]=='Em Rota' %}selected{% endif %}>Em Rota</option>
+                            <option value="Entregue" {% if p[10]=='Entregue' %}selected{% endif %}>Entregue</option>
+                            <option value="Atrasado" {% if p[10]=='Atrasado' %}selected{% endif %}>Atrasado</option>
+                            <option value="Correção" {% if p[10]=='Correção' %}selected{% endif %}>Correção</option>
+                            <option value="Cancelado" {% if p[10]=='Cancelado' %}selected{% endif %}>Cancelado</option>
+                        </select>
+                </td>
+                <td>{{ p[2] }}</td>
+                <td>{{ p[3] }}</td>
+                <td>{{ p[4] }}</td>
+                <td>{{ p[1] }}</td>
+                <td>
+                        <select name="motorista">
+                            <option value="">Selecione</option>
+                            {% for m in motoristas %}
+                                <option value="{{ m }}" {% if p[11]==m %}selected{% endif %}>{{ m }}</option>
+                            {% endfor %}
+                        </select>
+                </td>
+                <td>
+                        <select name="caminhao">
+                            <option value="">Selecione</option>
+                            {% for c in caminhoes %}
+                                <option value="{{ c }}" {% if p[12]==c %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                </td>
+                <td>{{ p[8] }}</td>
+                <td>{{ p[9] }}</td>
+                <td>{{ p[5] }}</td>
+                <td>{{ p[6] }}</td>
+                <td>{{ p[7] }}</td>
+                <td>{{ p[14] }}</td>
+                <td><textarea name="obs_logistica">{{ p[15] }}</textarea></td>
+                <td>
+                    {% if p[13] %}
+                        <a href="{{ url_for('static', filename=p[13]) }}" target="_blank">Download</a>
+                    {% else %}-{% endif %}
+                </td>
+                <td>
+                        <button type="submit">Atualizar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </main>
+</body>
+</html>
