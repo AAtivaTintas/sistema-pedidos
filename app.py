@@ -4,6 +4,9 @@ import pandas as pd
 import os
 from datetime import datetime, timedelta
 
+# ==================== CRIAR PASTA DE UPLOADS ====================
+os.makedirs("static/uploads", exist_ok=True)
+
 app = Flask(__name__)
 app.secret_key = "uma_chave_super_secreta_aqui"
 
@@ -84,7 +87,6 @@ def novo_pedido():
         arquivo_nome = None
         if arquivo and arquivo.filename != "":
             arquivo_nome = f"uploads/{arquivo.filename}"
-            os.makedirs("static/uploads", exist_ok=True)
             arquivo.save(f"static/{arquivo_nome}")
 
         with sqlite3.connect(DB_NAME) as conn:
@@ -179,7 +181,6 @@ def exportar():
     df.to_excel(file_path, index=False)
     return send_file(file_path, as_attachment=True)
 
-# ==================== RODAR APP ====================
+# ==================== RODAR APP LOCAL ====================
 if __name__ == "__main__":
-    os.makedirs("static/uploads", exist_ok=True)
     app.run(debug=True)
